@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poké-Debilidades</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #2b2b2b; color: white; text-align: center; padding: 20px; }
+        .container { background: #3d3d3d; padding: 20px; border-radius: 20px; max-width: 400px; margin: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        select { width: 80%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; font-size: 16px; background: #555; color: white; }
+        .btn { background: #ff4757; color: white; padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; width: 80%; }
+        #result { margin-top: 25px; text-align: left; padding: 15px; border-radius: 10px; background: #444; min-height: 50px; }
+        .type-tag { display: inline-block; padding: 5px 10px; border-radius: 5px; margin: 3px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .x4 { border: 2px solid gold; box-shadow: 0 0 10px gold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🔍 Debilidades Enemigas</h2>
+    <p>¿Qué tienes enfrente?</p>
+    
+    <select id="t1">
+        <option value="">Tipo 1</option>
+        <option value="acero">Acero</option><option value="agua">Agua</option><option value="bicho">Bicho</option>
+        <option value="dragon">Dragón</option><option value="electrico">Eléctrico</option><option value="fantasma">Fantasma</option>
+        <option value="fuego">Fuego</option><option value="hada">Hada</option><option value="hielo">Hielo</option>
+        <option value="lucha">Lucha</option><option value="normal">Normal</option><option value="planta">Planta</option>
+        <option value="psiquico">Psíquico</option><option value="roca">Roca</option><option value="siniestro">Siniestro</option>
+        <option value="tierra">Tierra</option><option value="veneno">Veneno</option><option value="volador">Volador</option>
+    </select>
+
+    <select id="t2">
+        <option value="">Tipo 2 (Opcional)</option>
+        <option value="acero">Acero</option><option value="agua">Agua</option><option value="bicho">Bicho</option>
+        <option value="dragon">Dragón</option><option value="electrico">Eléctrico</option><option value="fantasma">Fantasma</option>
+        <option value="fuego">Fuego</option><option value="hada">Hada</option><option value="hielo">Hielo</option>
+        <option value="lucha">Lucha</option><option value="normal">Normal</option><option value="planta">Planta</option>
+        <option value="psiquico">Psíquico</option><option value="roca">Roca</option><option value="siniestro">Siniestro</option>
+        <option value="tierra">Tierra</option><option value="veneno">Veneno</option><option value="volador">Volador</option>
+    </select>
+
+    <button class="btn" onclick="analizar()">Analizar Debilidades</button>
+
+    <div id="result">Selecciona tipos para ver contra qué son débiles.</div>
+</div>
+
+<script>
+    const tabla = {
+        acero: {fuego:2, lucha:2, tierra:2}, agua: {electrico:2, planta:2}, bicho: {fuego:2, volador:2, roca:2},
+        dragon: {hielo:2, dragon:2, hada:2}, electrico: {tierra:2}, fantasma: {fantasma:2, siniestro:2},
+        fuego: {agua:2, tierra:2, roca:2}, hada: {acero:2, veneno:2}, hielo: {fuego:2, lucha:2, roca:2, acero:2},
+        lucha: {volador:2, psiquico:2, hada:2}, normal: {lucha:2}, planta: {fuego:2, hielo:2, veneno:2, volador:2, bicho:2},
+        psiquico: {bicho:2, fantasma:2, siniestro:2}, roca: {agua:2, planta:2, lucha:2, tierra:2, acero:2},
+        siniestro: {lucha:2, bicho:2, hada:2}, tierra: {agua:2, planta:2, hielo:2}, veneno: {tierra:2, psiquico:2},
+        volador: {electrico:2, hielo:2, roca:2}
+    };
+
+    function analizar() {
+        let t1 = document.getElementById('t1').value;
+        let t2 = document.getElementById('t2').value;
+        if(!t1) return;
+
+        let debilidades = {};
+        // Mezclar tablas de tipos
+        [t1, t2].forEach(t => {
+            if(t && tabla[t]) {
+                for(let atacante in tabla[t]) {
+                    debilidades[atacante] = (debilidades[atacante] || 1) * tabla[t][atacante];
+                }
+            }
+        });
+
+        let html = "<b>Súper eficaz (x2):</b><br>";
+        let html4 = "<b>¡PELIGRO! Muy eficaz (x4):</b><br>";
+        let hay4 = false;
+
+        for(let d in debilidades) {
+            if(debilidades[d] === 4) {
+                html4 += `<span class="type-tag x4">${d}</span> `;
+                hay4 = true;
+            } else if(debilidades[d] === 2) {
+                html += `<span class="type-tag">${d}</span> `;
+            }
+        }
+
+        document.getElementById('result').innerHTML = (hay4 ? html4 + "<br><br>" : "") + html;
+    }
+</script>
+
+</body>
+</html>
