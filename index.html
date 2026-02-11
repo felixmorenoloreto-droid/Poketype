@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poké-Calculadora de Debilidades</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --card: #2d2d2d;
+            --text: #ffffff;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); text-align: center; padding: 20px; margin: 0; }
+        .container { background: var(--card); padding: 30px; border-radius: 25px; max-width: 450px; margin: auto; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        h2 { margin-top: 0; color: #ff4757; text-transform: uppercase; letter-spacing: 2px; }
+        
+        select { 
+            width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 2px solid #444; 
+            font-size: 16px; background: #3d3d3d; color: white; cursor: pointer; appearance: none;
+        }
+        
+        .btn { 
+            background: #ff4757; color: white; padding: 15px; border: none; border-radius: 12px; 
+            cursor: pointer; font-weight: bold; width: 100%; font-size: 18px; margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .btn:hover { background: #ff6b81; }
+
+        #result { margin-top: 25px; text-align: left; padding: 20px; border-radius: 15px; background: #1e1e1e; min-height: 100px; border: 1px solid #444; }
+        
+        .type-tag { 
+            display: inline-block; padding: 6px 12px; border-radius: 8px; margin: 4px; 
+            font-size: 13px; font-weight: bold; text-transform: uppercase; color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .section-title { font-size: 14px; margin-bottom: 10px; display: block; color: #aaa; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .x4 { border: 2px solid #fff; animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0px rgba(255,255,255,0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+            100% { box-shadow: 0 0 0 0px rgba(255,255,255,0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>⚡ Poketype</h2>
+    <p>Analiza las debilidades del enemigo</p>
+    
+    <select id="t1">
+        <option value="">Selecciona Tipo 1</option>
+        <option value="acero">Acero</option><option value="agua">Agua</option><option value="bicho">Bicho</option>
+        <option value="dragon">Dragón</option><option value="electrico">Eléctrico</option><option value="fantasma">Fantasma</option>
+        <option value="fuego">Fuego</option><option value="hada">Hada</option><option value="hielo">Hielo</option>
+        <option value="lucha">Lucha</option><option value="normal">Normal</option><option value="planta">Planta</option>
+        <option value="psiquico">Psíquico</option><option value="roca">Roca</option><option value="siniestro">Siniestro</option>
+        <option value="tierra">Tierra</option><option value="veneno">Veneno</option><option value="volador">Volador</option>
+    </select>
+
+    <select id="t2">
+        <option value="">Selecciona Tipo 2 (Opcional)</option>
+        <option value="acero">Acero</option><option value="agua">Agua</option><option value="bicho">Bicho</option>
+        <option value="dragon">Dragón</option><option value="electrico">Eléctrico</option><option value="fantasma">Fantasma</option>
+        <option value="fuego">Fuego</option><option value="hada">Hada</option><option value="hielo">Hielo</option>
+        <option value="lucha">Lucha</option><option value="normal">Normal</option><option value="planta">Planta</option>
+        <option value="psiquico">Psíquico</option><option value="roca">Roca</option><option value="siniestro">Siniestro</option>
+        <option value="tierra">Tierra</option><option value="veneno">Veneno</option><option value="volador">Volador</option>
+    </select>
+
+    <button class="btn" onclick="analizar()">CALCULAR DAÑO</button>
+
+    <div id="result">
+        <span style="color: #666;">El resultado aparecerá aquí...</span>
+    </div>
+</div>
+
+<script>
+    const tablaDebilidades = {
+        acero: {fuego: 2, lucha: 2, tierra: 2},
+        agua: {electrico: 2, planta: 2},
+        bicho: {fuego: 2, volador: 2, roca: 2},
+        dragon: {hielo: 2, dragon: 2, hada: 2},
+        electrico: {tierra: 2},
+        fantasma: {fantasma: 2, siniestro: 2},
+        fuego: {agua: 2, tierra: 2, roca: 2},
+        hada: {acero: 2, veneno: 2},
+        hielo: {fuego: 2, lucha: 2, roca: 2, acero: 2},
+        lucha: {volador: 2, psiquico: 2, hada: 2},
+        normal: {lucha: 2},
+        planta: {fuego: 2, hielo: 2, veneno: 2, volador: 2, bicho: 2},
+        psiquico: {bicho: 2, fantasma: 2, siniestro: 2},
+        roca: {agua: 2, planta: 2, lucha: 2, tierra: 2, acero: 2},
+        siniestro: {lucha: 2, bicho: 2, hada: 2},
+        tierra: {agua: 2, planta: 2, hielo: 2},
+        veneno: {tierra: 2, psiquico: 2},
+        volador: {electrico: 2, hielo: 2, roca: 2}
+    };
+
+    const colores = {
+        acero: "#B8B8D0", agua: "#6890F0", bicho: "#A8B820", dragon: "#7038F8",
+        electrico: "#F8D030", fantasma: "#705898", fuego: "#F08030", hada: "#EE99AC",
+        hielo: "#98D8D8", lucha: "#C03028", normal: "#A8A878", planta: "#78C850",
+        psiquico: "#F85888", roca: "#B8A038", siniestro: "#705848", tierra: "#E0C068",
+        veneno: "#A040A0", volador: "#A890F0"
+    };
+
+    function analizar() {
+        const t1 = document.getElementById('t1').value;
+        const t2 = document.getElementById('t2').value;
+        const resDiv = document.getElementById('result');
+
+        if (!t1) {
+            resDiv.innerHTML = "❌ Selecciona al menos el primer tipo.";
+            return;
+        }
+
+        let calculos = {};
+
+        // Aplicar debilidades del Tipo 1
+        if (tablaDebilidades[t1]) {
+            for (let atacante in tablaDebilidades[t1]) {
+                calculos[atacante] = tablaDebilidades[t1][atacante];
+            }
+        }
+
+        // Aplicar debilidades del Tipo 2 y multiplicar
+        if (t2 && t1 !== t2 && tablaDebilidades[t2]) {
+            for (let atacante in tablaDebilidades[t2]) {
+                calculos[atacante] = (calculos[atacante] || 1) * tablaDebilidades[t2][atacante];
+            }
+        }
+
+        let htmlX4 = "";
+        let htmlX2 = "";
+
+        for (let t in calculos) {
+            const color = colores[t];
+            const tag = `<span class="type-tag" style="background:${color}">${t}</span>`;
+            
+            if (calculos[t] === 4) {
+                htmlX4 += tag.replace('class="type-tag"', 'class="type-tag x4"');
+            } else if (calculos[t] === 2) {
+                htmlX2 += tag;
+            }
+        }
+
+        let finalHTML = "";
+        if (htmlX4) finalHTML += `<span class="section-title">DEBILIDAD CRÍTICA (x4)</span>${htmlX4}<br><br>`;
+        if (htmlX2) finalHTML += `<span class="section-title">DÉBIL CONTRA (x2)</span>${htmlX2}`;
+        if (!htmlX4 && !htmlX2) finalHTML = "🛡️ Este Pokémon no tiene debilidades elementales simples.";
+
+        resDiv.innerHTML = finalHTML;
+    }
+</script>
+
+</body>
+</html>
